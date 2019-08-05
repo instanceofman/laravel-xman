@@ -21,11 +21,24 @@ class Setup extends Command
     {
         $table = config('xman.table');
 
+        if(!$table) {
+            $this->error("Please run `php artisan vendor:publish` to copy config file before setup.");
+            return false;
+        }
+
         if ($exists = Schema::hasTable($table)) {
-            return;
+            return $this->success();
         }
 
         $this->runMigration($table);
+
+        return $this->success();
+    }
+
+    protected function success()
+    {
+        $this->info('Setup xman successfully!');
+        return true;
     }
 
     protected function runMigration($table)
@@ -34,9 +47,9 @@ class Setup extends Command
             $table->increments('id');
             $table->string('command', 150)->unique();
             $table->string('args', 150)->default('');
-            $table->bigInteger('start');
-            $table->bigInteger('end');
-            $table->text('logs');
+            $table->bigInteger('start')->nullable();
+            $table->bigInteger('end')->nullable();
+            $table->text('logs')->nullable();
             $table->string('status', 30);
             $table->timestamps();
         });

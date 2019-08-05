@@ -100,7 +100,7 @@ class ExecutionLogger
             'command' => $this->name,
             'args' => json_encode($this->args),
             'start' => $this->getTimestamp(),
-            'log' => '',
+            'logs' => '',
             'status' => self::STATUS_STARTED
         ]);
 
@@ -133,7 +133,7 @@ class ExecutionLogger
     private function saveLog()
     {
         $str = implode("\n", $this->logs);
-        $this->log->update(['log' => $str]);
+        $this->log->update(['logs' => $str]);
     }
 
     /**
@@ -143,7 +143,7 @@ class ExecutionLogger
     {
         $this->log->fill([
             'end' => $this->getTimestamp(),
-            'log' => implode("\n", $this->logs)
+            'logs' => implode("\n", $this->logs)
         ]);
     }
 

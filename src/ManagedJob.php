@@ -13,23 +13,9 @@ use LogicException;
  * Class ManagedExecutionJob
  * @package Isofman\LaravelXman
  */
-abstract class ManagedExecutionJob
+abstract class ManagedJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    /**
-     * @var int
-     */
-    public $tries = 1;
-    /**
-     * @var int
-     */
-    public $timeout = 999999;
-
-    /**
-     * @var string
-     */
-    protected $jobName;
 
     /**
      * @var ExecutionManager
@@ -39,7 +25,7 @@ abstract class ManagedExecutionJob
     /**
      * @var bool
      */
-    protected $shouldRun = true;
+    private $shouldRun = true;
 
     /**
      * ManagedExecutionJob constructor.
@@ -47,7 +33,15 @@ abstract class ManagedExecutionJob
      */
     public function __construct($args = [])
     {
-        $this->logger = new ExecutionLogger($this->jobName, $args);
+        $this->logger = new ExecutionLogger($this->jobName(), $args);
+        $this->tries = $this->tries();
+        $this->timeout = $this->timeout();
+    }
+
+    protected abstract function jobName();
+    protected abstract function tries();
+    protected function timeout() {
+        return 999999;
     }
 
     /**
@@ -55,23 +49,23 @@ abstract class ManagedExecutionJob
      */
     protected function beforeExecute()
     {
-        if (empty($this->jobName))
+        if (empty($this->jobName()))
             throw new LogicException("Unknown task name");
 
         $this->logger->start();
 
-        if (! app('xman')->checkin($this->jobName)) {
+        if (! app('xman')->checkin($this->jobName())) {
             $this->shouldRun = false;
         } else {
-            $this->logger->appendLog("Run " . $this->jobName);
+            $this->logger->appendLog("Run " . $this->jobName());
         }
     }
 
     protected function afterExecute()
     {
-        $this->logger->appendLog("Finished " . $this->jobName);
+        $this->logger->appendLog("Finished " . $this->jobName());
         $this->logger->complete();
-        app('xman')->checkout($this->jobName);
+        app('xman')->checkout($this->jobName());
     }
 
     protected function existWithoutExecute()
