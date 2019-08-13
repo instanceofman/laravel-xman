@@ -91,6 +91,7 @@ abstract class ManagedJob
                 $this->execute();
             } catch (\Exception $exception) {
                 $this->logExecutionErrors($exception->getMessage());
+                report($exception);
             }
             $this->afterExecute();
         } else {
