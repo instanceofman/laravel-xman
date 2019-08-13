@@ -74,6 +74,11 @@ abstract class ManagedJob
         $this->logger->complete();
     }
 
+    protected function logExecutionErrors(string $message = '')
+    {
+        $this->logger->appendLog($message);
+    }
+
     /**
      * @throws LogicException
      */
@@ -82,7 +87,11 @@ abstract class ManagedJob
         $this->beforeExecute();
 
         if ($this->shouldRun) {
-            $this->execute();
+            try {
+                $this->execute();
+            } catch (\Exception $exception) {
+                $this->logExecutionErrors($exception->getMessage());
+            }
             $this->afterExecute();
         } else {
             $this->existWithoutExecute();
