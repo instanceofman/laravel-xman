@@ -51,6 +51,8 @@ class Setup extends Command
             $table->bigInteger('end')->nullable();
             $table->text('logs')->nullable();
             $table->string('status', 30);
+            $table->string('progress', 30);
+            $table->string('total', 30);
             $table->timestamps();
         });
     }
