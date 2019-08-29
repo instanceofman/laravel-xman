@@ -18,7 +18,7 @@ abstract class ManagedJob
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var ExecutionManager
+     * @var ExecutionLogger
      */
     protected $logger;
 
